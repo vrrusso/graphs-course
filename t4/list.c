@@ -212,11 +212,13 @@ void * list_remove(List * list, void * item, bool(*equal_function)(void *,void *
 }
 
 
-int * vectorize(List * list){
+Route * vectorize(List * list){
 	Node * p = list->begin;
-	int * vector = (int *)malloc(sizeof(int)*list->size);
+	Route * vector = (Route *)malloc(sizeof(Route)*list->size);
 	for(int i=0;i<list->size;i++){
-		vector[i] = *((int*)p->content);
+		vector[i].destination = ((Route*)p->content)->destination;
+		vector[i].time = ((Route*)p->content)->time;
+		vector[i].price = ((Route*)p->content)->price;
 		p=p->next;
 	}
 	return vector;

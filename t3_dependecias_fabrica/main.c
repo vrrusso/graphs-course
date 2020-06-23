@@ -15,6 +15,7 @@ int main(void){
         insert_directed_edge(tasks,aux_task1,aux_task2);
     }
     List * topological_list = topological_sort(tasks,&cycle_check);
+    
     if(cycle_check){
         printf("-1\n");
     }

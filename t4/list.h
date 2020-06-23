@@ -5,6 +5,12 @@
 #define true 1
 #define false 0
 
+typedef struct route_{
+    int destination;
+    int time;
+    int price;
+}Route;
+
 
 typedef int bool;
 typedef struct list_ List;
@@ -35,7 +41,7 @@ void * list_remove(List * list, void * item, bool(*equal_function)(void *,void *
 
 int list_size(List * list);
 bool list_empty(List * list);
-int * vectorize(List * list);
+Route * vectorize(List * list);
 int list_size(List * list);
 
 #endif

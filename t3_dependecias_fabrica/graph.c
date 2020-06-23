@@ -89,7 +89,7 @@ int remove_edge(Graph *g, int vertex_a,int vertex_b){
     return ERROR;
 }
 
-
+//this is a recursive function tha makes the dfs while generating the topological list
 void topological_visit(Graph * g, char * visited, int starting_vertex, List * list,int* cycle_check){
     int * adj = vectorize(g->lists_of_edges[starting_vertex]);
     visited[starting_vertex] = '1';
@@ -122,6 +122,7 @@ List *  topological_sort(Graph * g,int* cycle_check){
     return topological_order;
 }
 
+//auxiliar function tha inverts the directed edges of a graph
 Graph * invert_graph(Graph* g){
     if(g!=NULL){
         Graph * inverse = create_graph(g->no_vertex);
@@ -144,7 +145,6 @@ Graph * invert_graph(Graph* g){
 int find_maximum_time(Graph* g,List* topological_list){
     int* topological_vector = vectorize(topological_list);
     Graph* inverse_g = invert_graph(g);
-    //print_graph(inverse_g);
     int * distancias = (int *)malloc(sizeof(int)*g->no_vertex);
     int tempo=0;
 
@@ -174,7 +174,7 @@ int find_maximum_time(Graph* g,List* topological_list){
 
 
 
-
+//cemitério de tentativas
 /*
 void dfs_visit(Graph * g, int v, int * clock,int * relative_times){
     int * adj = vectorize(g->lists_of_edges[v]);

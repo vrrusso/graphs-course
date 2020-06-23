@@ -21,7 +21,7 @@ bool is_there_edge(Graph * g,int origin_vertex,int destiny_vertex);//verifies if
 void print_graph(Graph *g);//prints the matrix
 
 
-List *  topological_sort(Graph * g, int* cycle_check);
-int find_maximum_time(Graph* g,List* topological_list);
+List *  topological_sort(Graph * g, int* cycle_check);//generates a list in topological order for a directed graph - verifies if there is a cycle
+int find_maximum_time(Graph* g,List* topological_list);//returns the maximum distance betwen in any connected portion of the graph
 
 #endif

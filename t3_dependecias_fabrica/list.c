@@ -51,7 +51,7 @@ Node * allocate_node(void * item, size_t data_size){
 	Node * new = (Node *)allocate(sizeof(Node));
 	new->content = allocate(data_size);
 	//transfer the data from item to new->content byte to byte
-	//TODO entender essa merda melhor
+	//TODO entender melhor
 	int i;
     for (i=0; i<data_size; i++){
        	*(char *)(new->content + i) = *(char *)(item + i);	

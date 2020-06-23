@@ -2,6 +2,10 @@
 #include "graph.h"
 #include <string.h>
 #include <stdio.h>
+#define INF 1000000
+
+//descobrir depois como representar infinito
+
 
 struct graph_{
     List ** lists_of_edges;
@@ -9,11 +13,7 @@ struct graph_{
     int no_vertex;
 };
 
-typedef struct route_{
-    int destination;
-    int time;
-    int price;
-}Route;
+
 
 //<!this 2 functions are meant to be passed to the generic list ADT
 bool equal_destinations(void * a,void * b){
@@ -23,6 +23,10 @@ bool equal_destinations(void * a,void * b){
 void print_route(void * route){
     Route a = *((Route *)route);
     printf("(%d,%d,%d)",a.destination,a.time,a.price);
+}
+
+void print_list(void* integer){
+    printf("%d",*((int *)integer));
 }
 
 
@@ -75,44 +79,79 @@ void print_graph(Graph *g){
     printf("\n");
 }
 
-
-/*
-bool is_there_edge(Graph *g,int origin_vertex,int destiny_vertex){
-    if(g == NULL ||origin_vertex<0||origin_vertex>=g->no_vertex||origin_vertex<0||origin_vertex>=g->no_vertex){
-            return ERROR;
+//working and
+void relaxing(Graph *g, int u,int v,int weigth,int * distances,int * parents,int price,int* prices){
+    if(g!=NULL && distances[v]>distances[u]+weigth){
+        distances[v] = distances[u]+weigth;
+        prices[v] = prices[u]+price;
+        parents[v] = u;
     }
-    return list_search(g->lists_of_edges[origin_vertex],&(destiny_vertex),equal_integers);
 }
 
-int remove_directed_edge(Graph * g,int origin_vertex,int destiny_vertex){
-    if(g == NULL ||origin_vertex<0||origin_vertex>=g->no_vertex||origin_vertex<0||origin_vertex>=g->no_vertex)
-            return ERROR;
-    //<!-- in the case where theres no item to be removed the list returns a NULL, so we must filter that
-    void * op = list_remove(g->lists_of_edges[origin_vertex],&(destiny_vertex),equal_integers);
-    return op == NULL?ERROR:*((int *) op);
-}
 
-int remove_edge(Graph *g, int vertex_a,int vertex_b){
-    if(remove_directed_edge(g,vertex_a,vertex_b)!= ERROR)
-        return remove_directed_edge(g,vertex_b,vertex_a);
-    return ERROR;
-}
-//auxiliar function tha inverts the directed edges of a graph
-Graph * invert_graph(Graph* g){
-    if(g!=NULL){
-        Graph * inverse = create_graph(g->no_vertex);
-        if(inverse != NULL){
-            for(int i = 0;i<g->no_vertex;i++ ){
-                int * adj = vectorize(g->lists_of_edges[i]);
-                for(int j=0;j<list_size(g->lists_of_edges[i]);j++){
-                    insert_directed_edge(inverse, adj[j],i);
-                }
-                free(adj);
+//algoritmo de dijkstra sem priority queue O(v²) :(
+void minimum_path(Graph * g, int source,int destiny){
+    int * parents = (int *)malloc(sizeof(int)*g->no_vertex);
+    int * distances_from_source = (int *)malloc(sizeof(int)*g->no_vertex);
+    int * prices = (int *)malloc(sizeof(int)*g->no_vertex);
+    int * visited = (int *)malloc(sizeof(int)*g->no_vertex);
+    int index_min = 0;
+    int min = INF;
+    int n = g->no_vertex;
+    for(int i=0;i<g->no_vertex;i++){
+        parents[i] = -1;
+        distances_from_source[i] = INF;
+        visited[i]=0;
+        prices[i]=0;
+    }
+
+    //marcar o vertice fonte
+    distances_from_source[source] = 0;
+    visited[source] = 1;n--;
+    //relaxing the adj
+    Route * adj = vectorize(g->lists_of_edges[source]);
+    for(int i=0;i<list_size(g->lists_of_edges[source]);i++){
+        relaxing(g,source,adj[i].destination,adj[i].time,distances_from_source,parents,adj[i].price,prices);
+    }
+    free(adj);
+    for(int i=0;i<g->no_vertex;i++){
+        if(visited[i]!=1 && distances_from_source[i]<min){
+            min = distances_from_source[i];
+            index_min = i;
+        }
+    }
+
+    //fazer a mesma coisa para todos os outros vértices
+    while(n){
+        visited[index_min] = 1;n--;
+        //relaxing
+        Route * adj = vectorize(g->lists_of_edges[index_min]);
+        for(int i=0;i<list_size(g->lists_of_edges[index_min]);i++){
+            relaxing(g,index_min,adj[i].destination,adj[i].time,distances_from_source,parents,adj[i].price,prices);
+        }
+        free(adj);
+        index_min = 0;
+        min = INF;
+        for(int i=0;i<g->no_vertex;i++){
+            if(visited[i]!=1 && distances_from_source[i]<min){
+                min = distances_from_source[i];
+                index_min = i;
             }
         }
-        return inverse;
     }
-    return NULL;
-}
-*/
+    List * path = create_list(sizeof(int));
+    int v = destiny;
+    while(v != -1){
+        list_push_front(path,(void*)&v);
+        v = parents[v];
+    }
+    list_print(path,print_list);
+    printf("%d %d\n",distances_from_source[destiny],prices[destiny]);
 
+
+
+    erase_list(&path);
+    free(parents);
+    free(distances_from_source);
+    free(visited);
+}
